@@ -87,9 +87,11 @@ module.exports = {
   deleteMovie,
   getMovie,
 };
+
+
 /*  "country": "Россия",
     "director": "Бондарчук",
-    "duration": "2 часа",
+    "duration": "2",
     "year": "2022 год",
     "description": "Боевик",
     "image": "https://youtu.be/0yjJHcRw6M4",
