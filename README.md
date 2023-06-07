@@ -5,5 +5,5 @@
 
 IP-адрес 158.160.13.240
 
-Backend https://filmoteca-back.nomoredomains.rocks
+Backend https://filmoteca-back.nomoredomains.rocks/api
  
