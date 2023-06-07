@@ -2,6 +2,8 @@ const Movie = require('../models/movie');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const AccessRightsError = require('../errors/AccessRightsError');
+const { ERROR_VALIDATION_MOVIE, ERROR_ACCESS_MOVIE, ERROR_NOT_FOUND } = require('../utils/errorMessage');
+const { MOVIE_TEXT } = require('../utils/sendMessage');
 
 // создаёт фильм с переданными в теле данными (film)
 const createMovie = (req, res, next) => {
@@ -39,7 +41,7 @@ const createMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Error validation movie'));
+        next(new BadRequestError(ERROR_VALIDATION_MOVIE));
       } else {
         next(err);
       }
@@ -68,15 +70,15 @@ const deleteMovie = async (req, res, next) => {
       owner: req.user._id,
     });
     if (deletedCard.deletedCount === 0) {
-      next(new AccessRightsError('Ошибка доступа! Карточка с данным не принадлежит пользователю'));
+      next(new AccessRightsError(ERROR_ACCESS_MOVIE));
     } else {
       return res
         .status(200)
-        .send({ message: 'Карточка удалена успешно и без ошибок' });
+        .send({ MOVIE_TEXT });
     }
   } catch (err) {
     if (err.name === 'DocumentNotFoundError') { // проверка _id не существует в базе
-      return next(new NotFoundError('Not found'));
+      return next(new NotFoundError(ERROR_NOT_FOUND));
     }
     next(err);
   }
@@ -88,7 +90,6 @@ module.exports = {
   getMovie,
 };
 
-
 /*  "country": "Россия",
     "director": "Бондарчук",
     "duration": "2",
@@ -98,4 +99,5 @@ module.exports = {
     "trailerLink": "https://youtu.be/0yjJHcRw6M4",
     "thumbnail": "https://phonoteka.org/uploads/posts/2023-03/1680037471_phonoteka-org-p-dedus-fiksiki-oboi-vkontakte-24.jpg",
     "nameRU": "Фиксики",
-    "nameEN": "Fixies"  */
+    "nameEN": "Fixies" ,
+    "movieId": "454545" */

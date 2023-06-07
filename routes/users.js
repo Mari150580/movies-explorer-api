@@ -1,7 +1,6 @@
 const express = require('express');
-const { celebrate, Joi } = require('celebrate');
 const auth = require('../middlewares/auth');
-const { URL_REGEXP } = require('../config');
+const { usersPatchValidator } = require('../middlewares/validator');
 
 const usersRouter = express.Router();
 const {
@@ -13,11 +12,6 @@ const {
 usersRouter.get('/me', auth, getUser);
 
 // обновляет информацию о пользователе (email и имя)
-usersRouter.patch('/me', auth, celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().regex(URL_REGEXP),
-  }),
-}), updatesUserInformation);
+usersRouter.patch('/me', auth, usersPatchValidator, updatesUserInformation);
 
 module.exports = usersRouter;

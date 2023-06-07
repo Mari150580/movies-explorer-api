@@ -7,16 +7,12 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 const validationErrors = require('celebrate').errors;
-const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const usersRouter = require('./routes/users'); // импортируем роутер
-const movieRouter = require('./routes/movie');
-const signupRouter = require('./routes/signup');
-const signInRouter = require('./routes/signin');
 const errorHandler = require('./middlewares/error-handler');
 const limiter = require('./middlewares/limiter');
-const { PORT, DB_ADDRESS } = require('./config');
+const { PORT, DB_ADDRESS } = require('./utils/config');
+const router = require('./routes');
 
 const app = express();
 
@@ -34,24 +30,12 @@ app.use(helmet());
 // корс
 app.use(cors());
 
-app.use(limiter);
-
-// подключаем мидлвары, роуты и всё остальное...
-
 app.use(requestLogger); // подключаем логгер запросов
 
+app.use(limiter);
+
 // Подключаем роутеры
-app.use('/signup', signupRouter);
-
-app.use('/signin', signInRouter);
-
-app.use('/users', usersRouter);
-
-app.use('/movie', movieRouter);
-
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('URL does not exist'));
-});
+app.use(router);
 
 app.use(errorLogger); // подключаем логгер ошибок
 

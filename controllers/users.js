@@ -6,7 +6,14 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const UserExistsError = require('../errors/UserExistsError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-const { JWT_SECRET } = require('../config');
+const { JWT_SECRET } = require('../utils/config');
+const {
+  ERROR_VALIDATION_USERS,
+  ERROR_TEXT_USERS, ERROR_VALIDATION,
+  ERROR_TEXT,
+  NOT_FOUND_USER,
+  ERROR_NOT_FOUND,
+} = require('../utils/errorMessage');
 
 // создаёт пользователя (email, password и name)
 const createUser = (req, res, next) => {
@@ -28,11 +35,11 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Error validation user'));
+        next(new BadRequestError(ERROR_VALIDATION_USERS));
       } else if (err.code === 11000) { // проверка на индивидуальность email
-        next(new UserExistsError('Пользователь с такими данными уже существует'));
+        next(new UserExistsError(ERROR_TEXT_USERS));
       } else if (err.name === 'Error') {
-        next(new BadRequestError('Error validation'));
+        next(new BadRequestError(ERROR_VALIDATION));
       } else {
         next(err);
       }
@@ -45,14 +52,14 @@ const login = (req, res, next) => {
   // data.jwt, сроком на неделю, сверка паролей
   User
     .findOne({ email }).select('+password')
-    .orFail(() => next(new UnauthorizedError('Неправильные почта или пароль')))
+    .orFail(() => next(new UnauthorizedError(ERROR_TEXT)))
     .then((user) => bcrypt.compare(password, user.password)
     // eslint-disable-next-line consistent-return
       .then((matched) => {
         if (matched) {
           return user;
         }
-        throw new UnauthorizedError('Пользователь не найден');
+        throw new UnauthorizedError(NOT_FOUND_USER);
       }))
     .then((user) => {
       const jwt = jsonwebtoken.sign(
@@ -60,7 +67,7 @@ const login = (req, res, next) => {
         process.env.NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      res.status(200).send({ user, jwt });
+      res.status(200).send({ jwt });
     })
     .catch((err) => {
       next(err);
@@ -73,16 +80,16 @@ const getUser = (req, res, next) => {
   User.findById(userId)
     . then((user) => {
       if (!user) {
-        throw next(new NotFoundError('User not found'));
+        throw next(new NotFoundError(NOT_FOUND_USER));
       }
       res.status(200).send({ data: user });
     })
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        next(new BadRequestError('Not found'));
+        next(new BadRequestError(ERROR_NOT_FOUND));
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        next(new NotFoundError('Not found'));
+        next(new NotFoundError(ERROR_NOT_FOUND));
       } else {
         next(err);
       }
@@ -100,7 +107,7 @@ const updatesUserInformation = (req, res, next) => {
     .then((data) => res.status(200).send(data))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Error validation user'));
+        next(new BadRequestError(ERROR_VALIDATION_USERS));
       }
       next(err);
     });
