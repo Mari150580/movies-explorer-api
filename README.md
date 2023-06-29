@@ -3,7 +3,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 158.160.13.240
+IP-адрес 51.250.21.138
 
 Backend https://filmoteca-back.nomoredomains.rocks/api
  
