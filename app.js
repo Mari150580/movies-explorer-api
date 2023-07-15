@@ -19,10 +19,7 @@ const app = express();
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(DB_ADDRESS, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(DB_ADDRESS);
 
 app.use(express.json());
 app.use(helmet());
