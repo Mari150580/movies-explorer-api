@@ -50,7 +50,7 @@ const createMovie = (req, res, next) => {
 
 // возвращает все сохранённые текущим  пользователем фильмы
 const getMovie = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .populate(['owner'])
     .then((cards) => res.status(200).send(cards))
     .catch((err) => {
